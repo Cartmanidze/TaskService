@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -37,15 +38,15 @@ namespace TaskService.Services
             await _taskRepository.SaveAsync(token);
 #pragma warning disable 4014
             _taskRunnerService.RunTask(textTask, token);
-            _logger.LogInformation($"Task with id = {textTask.Oid} running...");
 #pragma warning restore 4014
+            _logger.LogInformation($"Task with id = {textTask.Oid} running...");
         }
 
         public async Task<IEnumerable<TextTaskResultDto>> GetTaskResultsAsync(Guid id, CancellationToken token)
         {
-            var text = await _taskRepository.GetByIdAsync(id, token);
+            var textTasks = await _taskRepository.GetAsync(t => t.Oid == id, includeProperties: "TextTaskResults", token: token);
             var textTaskResults =
-                _mapper.Map<IEnumerable<TextTaskResult>, IEnumerable<TextTaskResultDto>>(text.TextTaskResults);
+                _mapper.Map<IEnumerable<TextTaskResult>, IEnumerable<TextTaskResultDto>>(textTasks.SelectMany(t => t.TextTaskResults));
             return textTaskResults;
         }
     }
