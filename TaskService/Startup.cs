@@ -8,7 +8,6 @@ using GrpcFind;
 using GrpcText;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using TaskService.Configurations;
 using TaskService.Context;
 using TaskService.Profiles;
 using TaskService.Repositories;
@@ -33,8 +32,6 @@ namespace TaskService
                 var connectionString = Configuration.GetConnectionString("AppConnectionString");
                 opt.UseSqlServer(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
             });
-            services.AddOptions<TaskExecutorConfiguration>()
-                .Bind(Configuration.GetSection(nameof(TaskExecutorConfiguration)));
             services.AddAutoMapper(typeof(TextTaskProfile));
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ITaskResultRepository, TaskResultRepository>();
