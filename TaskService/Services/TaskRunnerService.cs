@@ -44,9 +44,9 @@ namespace TaskService.Services
             using var taskResultRepository = scope.ServiceProvider.GetService<ITaskResultRepository>() ?? throw new Exception("Cannot get task result repository");
             while (DateTime.Now < textTask.EndTime && !token.IsCancellationRequested)
             {
+                if (DateTime.Now < textTask.StartTime) continue;
                 try
                 {
-
                     var responseTextAll = await _textClient.GetTextsAllAsync(new TextAllRequest());
                     var notProcessedTexts = responseTextAll.Items.Where(t => !processedTextsIds.Contains(t.Id));
                     foreach (var text in notProcessedTexts)
