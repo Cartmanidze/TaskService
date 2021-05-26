@@ -5,9 +5,11 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
-COPY ./TaskService/TaskService ./TaskService/TaskService
-WORKDIR ./TaskService/TaskService ./TaskService/TaskService
-RUN dotnet restore "TaskService.csproj"
+COPY NuGet.Config NuGet.Config
+COPY TaskService.csproj TaskService.csproj
+RUN dotnet restore TaskService.csproj
+COPY . .
+WORKDIR /src
 RUN dotnet build "TaskService.csproj" -c Release -o /app/build
 
 FROM build AS publish
