@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,16 +26,18 @@ namespace TaskService.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(TextTaskDto textTaskDto, CancellationToken token)
         {
+            if (textTaskDto.StartTime >= textTaskDto.EndTime) return BadRequest("Start time more than or equal end time");
+            if (textTaskDto.EndTime <= DateTime.Now) return BadRequest("Now time more than or equal end time");
             await _taskService.PutTaskAndStartAsync(textTaskDto, token);
             return Ok();
         }
 
         [HttpGet]
-        public async Task<IEnumerable<TextTaskResultDto>> GetById(string id, CancellationToken token)
+        public async Task<ActionResult> GetById(string id, CancellationToken token)
         {
-            if (!Guid.TryParse(id, out var val)) return null;
+            if (!Guid.TryParse(id, out var val)) return BadRequest("Id is not GUID");
             var results = await _taskService.GetTaskResultsAsync(val, token);
-            return results;
+            return results.Any() ? Ok(results) : Content("Результатов по заданному идентификатору не найдено");
         }
     }
 }

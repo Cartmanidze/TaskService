@@ -31,8 +31,6 @@ namespace TaskService.Services
 
         public async Task PutTaskAndStartAsync(TextTaskDto textTaskDto, CancellationToken token)
         {
-            if (textTaskDto.StartTime >= textTaskDto.EndTime) throw new Exception("Start time more than or equal end time");
-            if (textTaskDto.EndTime <= DateTime.Now) throw new Exception("Now time more than or equal end time");
             var textTask = _mapper.Map<TextTaskDto, TextTask>(textTaskDto);
             await _taskRepository.CreateAsync(textTask, token);
             await _taskRepository.SaveAsync(token);
