@@ -35,9 +35,9 @@ namespace TaskService.Controllers
         [HttpGet]
         public async Task<ActionResult> GetById(string id, CancellationToken token)
         {
-            if (!Guid.TryParse(id, out var val)) return BadRequest("Id is not GUID");
+            if (!Guid.TryParse(id, out var val)) return BadRequest("Id is not guid");
             var results = await _taskService.GetTaskResultsAsync(val, token);
-            return results.Any() ? Ok(results) : Content("Результатов по заданному идентификатору не найдено");
+            return results.Any() ? Ok(results) : Content("Results not found");
         }
     }
 }

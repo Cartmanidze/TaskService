@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ namespace TaskService.Tests.UnitTests
 {
     public class TaskControllerTests
     {
+        [Fact]
         public async Task Post_ReturnsBadRequest_IfStartTimeMoreOrEqualsThanEndTime()
         {
             var mockTaskService = new Mock<ITaskService>();
@@ -22,6 +24,7 @@ namespace TaskService.Tests.UnitTests
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
+        [Fact]
         public async Task Post_ReturnsBadRequest_IfEndTimeLessOrEqualsThanNow()
         {
             var mockTaskService = new Mock<ITaskService>();
@@ -32,12 +35,25 @@ namespace TaskService.Tests.UnitTests
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
+        [Fact]
         public async Task GetById_ReturnsBadRequest_IfIdIsNotGuid()
         {
             var mockTaskService = new Mock<ITaskService>();
             var taskController = new TaskController(mockTaskService.Object);
             var result = await taskController.GetById("52", CancellationToken.None);
             Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task GetById_ReturnsContentResultsNotFound_IfResultsIsEmptyCollection()
+        {
+            var id = Guid.NewGuid();
+            var mockTaskService = new Mock<ITaskService>();
+            mockTaskService.Setup(t => t.GetTaskResultsAsync(id, CancellationToken.None))
+                .ReturnsAsync(new List<TextTaskResultDto>());
+            var taskController = new TaskController(mockTaskService.Object);
+            var result = await taskController.GetById(id.ToString(), CancellationToken.None);
+            Assert.IsType<ContentResult>(result);
         }
     }
 }
